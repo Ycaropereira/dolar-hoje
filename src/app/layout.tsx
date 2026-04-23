@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://dolar-hoje.vercel.app"),
+  metadataBase: new URL("https://dolar-hoje-neon.vercel.app"),
   title: "Dólar Hoje (USD/BRL) - Cotação em Tempo Real",
   description:
     "Veja o dólar hoje (USD/BRL), variação, máxima e mínima. Use o conversor USD ⇄ BRL e confira outras moedas como euro e libra.",

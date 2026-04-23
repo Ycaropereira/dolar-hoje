@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://dolar-hoje.vercel.app/sitemap.xml",
+    sitemap: "https://dolar-hoje-neon.vercel.app/sitemap.xml",
   };
 }
