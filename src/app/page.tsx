@@ -23,16 +23,18 @@ type Cambios = {
   ARSBRL: AwesomeCambio;
 };
 
-async function fetchCambios(): Promise<Cambios> {
+async function fetchCambios(): Promise<Cambios | null> {
   const url =
     "https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,GBP-BRL,ARS-BRL";
-  const res = await fetch(url, {
-    next: { revalidate },
-  });
-  if (!res.ok) {
-    throw new Error("Falha ao consultar a cotação.");
+  try {
+    const res = await fetch(url, {
+      next: { revalidate },
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as Cambios;
+  } catch {
+    return null;
   }
-  return (await res.json()) as Cambios;
 }
 
 function formatarMoedaBRL(valor: number): string {
@@ -80,7 +82,87 @@ function VariacaoBadge({ pct }: { pct: number }) {
 
 export default async function Home() {
   const data = await fetchCambios();
-  const usd = data.USDBRL;
+  const usd = data?.USDBRL;
+
+  if (!data || !usd) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 to-sky-100">
+        <div className="mx-auto w-full max-w-6xl px-4 py-10">
+          <header className="text-center">
+            <h1 className="text-4xl font-bold tracking-tight text-zinc-900 sm:text-5xl">
+              Dólar Hoje (USD/BRL)
+            </h1>
+            <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-zinc-700">
+              Cotação temporariamente indisponível. Tente novamente em alguns minutos.
+            </p>
+          </header>
+
+          <div className="mt-10 grid gap-6 lg:grid-cols-2">
+            <section className="rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
+              <h2 className="text-xl font-semibold text-zinc-900">Cotação do dólar</h2>
+              <p className="mt-3 text-zinc-700">
+                No momento não foi possível consultar a fonte de dados.
+              </p>
+              <p className="mt-3 text-xs text-zinc-500">
+                Se o problema persistir, entre em contato em{" "}
+                <a
+                  className="text-sky-700 hover:underline"
+                  href="mailto:suportcalculo@gmail.com"
+                >
+                  suportcalculo@gmail.com
+                </a>
+                .
+              </p>
+            </section>
+
+            <section className="rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
+              <h2 className="text-xl font-semibold text-zinc-900">Conversor USD ⇄ BRL</h2>
+              <p className="mt-3 text-zinc-700">
+                O conversor depende da cotação do momento e ficará disponível assim que a
+                consulta voltar.
+              </p>
+            </section>
+          </div>
+
+          <section className="mt-10 rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
+            <h2 className="text-2xl font-bold text-zinc-900">FAQ</h2>
+            <div className="mt-6 grid gap-5">
+              <div>
+                <h3 className="text-lg font-semibold text-zinc-900">O que significa USD/BRL?</h3>
+                <p className="mt-2 text-sm text-zinc-700 leading-relaxed">
+                  USD/BRL é o par de moedas que representa quantos reais (BRL) equivalem a 1
+                  dólar americano (USD).
+                </p>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-zinc-900">Por que a cotação pode ficar indisponível?</h3>
+                <p className="mt-2 text-sm text-zinc-700 leading-relaxed">
+                  A cotação depende de uma fonte externa. Instabilidades temporárias podem
+                  ocorrer e normalmente se resolvem em poucos minutos.
+                </p>
+              </div>
+            </div>
+            <p className="mt-6 text-sm text-zinc-700">
+              Links úteis:
+              <span className="ml-2">
+                <Link className="text-sky-700 hover:underline" href="/privacidade">
+                  Privacidade
+                </Link>
+                <span className="px-2 text-zinc-400">·</span>
+                <Link className="text-sky-700 hover:underline" href="/termos">
+                  Termos
+                </Link>
+                <span className="px-2 text-zinc-400">·</span>
+                <Link className="text-sky-700 hover:underline" href="/contato">
+                  Contato
+                </Link>
+              </span>
+            </p>
+          </section>
+        </div>
+      </div>
+    );
+  }
 
   const bid = parseNumber(usd.bid);
   const high = parseNumber(usd.high);
